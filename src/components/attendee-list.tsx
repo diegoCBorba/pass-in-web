@@ -7,35 +7,92 @@ import { Table } from './table/table'
 import { TableHeader } from './table/table-header'
 import { TableCell } from './table/table-cell'
 import { TableRow } from './table/table-row'
-import { ChangeEvent, useState } from 'react'
-import { attendees } from '../data/attendees'
+import { ChangeEvent, useEffect, useState } from 'react'
 
 dayjs.extend(relativeTime)
 dayjs.locale('pt-br')
 
-export function AttendeeList(){
-    const [search, setSearch] = useState('')
-    const [page, setPage] = useState(1)
-    const totalPages = Math.ceil(attendees.length/10)
+interface Attendee {
+    id: string,
+    name: string,
+    email: string,
+    checkedInAt: string | null
+    createdAt: string,
+}
 
-    function goToFirstPage(){
-        setPage(1)
+export function AttendeeList() {
+    const [search, setSearch] = useState(()=>{
+        const url = new URL(window.location.toString())     
+        if(url.searchParams.has('search')){
+            return url.searchParams.get('search') ?? ''
+        }
+        return ''
+    })
+
+    const [page, setPage] = useState(()=>{
+        const url = new URL(window.location.toString())     
+        if(url.searchParams.has('page')){
+            return Number(url.searchParams.get('page'))
+        }
+        return 1
+    })
+
+    const [total, setTotal] = useState(0)
+    const [attendees, setAttendees] = useState<Attendee[]>([])
+    const totalPages = Math.ceil(total / 10)
+
+    useEffect(() => {
+        const url = new URL("http://localhost:3333/events/9e9bd979-9d10-4915-b339-3786b1634f33/attendees") 
+
+        url.searchParams.set('pageIndex', String(page -1))
+        
+        if(search.length > 0){
+            url.searchParams.set('query', search)
+        }
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                setAttendees(data.attendees),
+                setTotal(data.total)
+            })
+    }, [page, search])
+
+    function setCurrentPage(page: number){
+        const url = new URL(window.location.toString()) 
+        url.searchParams.set('page', String(page))
+
+        window.history.pushState({},  "", url)
+        setPage(page)
     }
 
-    function goToLastPage(){
-        setPage(totalPages)
+    function setCurrentSearch(search: string){
+        const url = new URL(window.location.toString()) 
+        url.searchParams.set('search', search)
+
+        window.history.pushState({},  "", url)
+        setSearch(search)
     }
 
-    function goToPreviousPage(){
-        setPage(page - 1)
+    function goToFirstPage() {
+        setCurrentPage(1)
     }
 
-    function goToNextPage(){
-        setPage(page + 1)
+    function goToLastPage() {
+        setCurrentPage(totalPages)
     }
 
-    function onSearchInputChanged(event: ChangeEvent<HTMLInputElement>){
-        setSearch(event.target.value)
+    function goToPreviousPage() {
+        setCurrentPage(page - 1)
+    }
+
+    function goToNextPage() {
+        setCurrentPage(page + 1)
+    }
+
+    function onSearchInputChanged(event: ChangeEvent<HTMLInputElement>) {
+        setCurrentSearch(event.target.value)
+        setCurrentPage(1)
     }
 
     return (
@@ -43,31 +100,29 @@ export function AttendeeList(){
             <div className="flex gap-3 items-center">
                 <h1 className="font-bold text-2xl">Participantes</h1>
                 <div className="px-3 w-72 py-1.5 border border-white/10 rounded-lg flex items-center gap-3">
-                    <Search className="size-4 text-emerald-300"/>
-                    <input onChange={onSearchInputChanged} className="bg-transparent flex-1 outline-none h-auto border-0 p-0 text-sm" type="text" placeholder="Buscar participante..."/>
+                    <Search className="size-4 text-emerald-300" />
+                    <input value={search} onChange={onSearchInputChanged} className="bg-transparent flex-1 outline-none h-auto border-0 p-0 text-sm focus:ring-0" type="text" placeholder="Buscar participante..." />
                 </div>
-
-                {search}
             </div>
             <Table>
                 <thead>
-                    <TableRow className="text-left">
+                    <tr className="border-b border-white/10 text-left">
                         <TableHeader style={{ width: 48 }}>
-                            <input className="size-4 bg-white/5 rounded border border-white/10"  type="checkbox"/>
+                            <input className="size-4 bg-white/5 rounded border border-white/10" type="checkbox" />
                         </TableHeader>
                         <TableHeader>Código</TableHeader>
                         <TableHeader>Participante</TableHeader>
                         <TableHeader>Data da inscrição</TableHeader>
                         <TableHeader>Data do check-in</TableHeader>
                         <TableHeader style={{ width: 64 }}></TableHeader>
-                    </TableRow>
+                    </tr>
                 </thead>
                 <tbody>
-                    {attendees.slice((page-1)*10, page*10).map((attendee) => {
-                        return(
+                    {attendees.map((attendee) => {
+                        return (
                             <TableRow key={attendee.id}>
                                 <TableCell>
-                                    <input className="size-4 bg-white/5 rounded border border-white/10" type="checkbox"/>
+                                    <input className="size-4 bg-white/5 rounded border border-white/10" type="checkbox" />
                                 </TableCell>
                                 <TableCell>{attendee.id}</TableCell>
                                 <TableCell>
@@ -80,11 +135,13 @@ export function AttendeeList(){
                                     {dayjs().to(attendee.createdAt)}
                                 </TableCell>
                                 <TableCell>
-                                    {dayjs().to(attendee.checkedInAt)}
+                                    {attendee.checkedInAt 
+                                    ? dayjs().to(attendee.checkedInAt) 
+                                    : <span className="text-zinc-400">Não fez check-in</span>}
                                 </TableCell>
                                 <TableCell>
                                     <IconButton transparent>
-                                        <MoreHorizontal className="size-4"/>
+                                        <MoreHorizontal className="size-4" />
                                     </IconButton>
                                 </TableCell>
                             </TableRow>
@@ -93,22 +150,22 @@ export function AttendeeList(){
                 </tbody>
                 <tfoot>
                     <tr>
-                        <TableCell className='py-3 px-4 text-sm text-zinc-300' colSpan={3}>Mostrando 10 de {attendees.length} itens</TableCell>
+                        <TableCell className='py-3 px-4 text-sm text-zinc-300' colSpan={3}>Mostrando {attendees.length} de {total} itens</TableCell>
                         <TableCell className="text-right" colSpan={3}>
                             <div className="inline-flex items-center gap-8">
                                 <span>Paǵina {page} de {totalPages}</span>
                                 <div className="flex gap-1.5">
                                     <IconButton onClick={goToFirstPage} disabled={page === 1}>
-                                            <ChevronsLeft className="size-4"/>
+                                        <ChevronsLeft className="size-4" />
                                     </IconButton>
                                     <IconButton onClick={goToPreviousPage} disabled={page === 1}>
-                                            <ChevronLeft className="size-4"/>
+                                        <ChevronLeft className="size-4" />
                                     </IconButton>
                                     <IconButton onClick={goToNextPage} disabled={page === totalPages}>
-                                            <ChevronRight className="size-4"/>
+                                        <ChevronRight className="size-4" />
                                     </IconButton>
                                     <IconButton onClick={goToLastPage} disabled={page === totalPages}>
-                                            <ChevronsRight className="size-4"/>
+                                        <ChevronsRight className="size-4" />
                                     </IconButton>
                                 </div>
                             </div>
