@@ -24,3 +24,6 @@ O pass.in é uma aplicação de **gestão de participantes em eventos presenciai
 2. Instale as dependências do cliente: `npm install`
 
 3. Inicie o cliente em modo de desenvolvimento: `npm run dev`
+
+---
+![Projeto](https://github.com/diegoCBorba/pass-in-web/assets/90847079/5539da97-62ab-4bec-9711-7fbb7ce2b18d)
