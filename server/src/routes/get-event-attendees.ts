@@ -26,7 +26,8 @@ export async function getEventAttendees(app: FastifyInstance) {
               createAt: z.date(),
               checkInAt: z.date().nullable(),
             })
-          )
+          ),
+          total: z.number()
         })
        }
       }
@@ -34,32 +35,45 @@ export async function getEventAttendees(app: FastifyInstance) {
       const { eventId } = req.params
       const { pageIndex, query } = req.query
 
-      const attendees = await prisma.attendee.findMany({
-        select:{
-          id: true,
-          name: true,
-          email: true,
-          createdAt: true,
-          checkIn: {
-            select: {
-              createdAt: true,
+      const [attendees, total] = await Promise.all([
+        prisma.attendee.findMany({
+          select:{
+            id: true,
+            name: true,
+            email: true,
+            createdAt: true,
+            checkIn: {
+              select: {
+                createdAt: true,
+              }
             }
+          },
+          where: query ? {
+            eventId,
+            name: {
+              contains: query,
+            }
+          } : {
+            eventId,
+          },
+          take: 10,
+          skip: pageIndex * 10,
+          orderBy: {
+            createdAt: 'desc',
+          },
+        }),
+        prisma.attendee.count({
+          where: query ? {
+            eventId,
+            name: {
+              contains: query,
+            }
+          } : {
+            eventId,
           }
-        },
-        where: query ? {
-          eventId,
-          name: {
-            contains: query,
-          }
-        } : {
-          eventId,
-        },
-        take: 10,
-        skip: pageIndex * 10,
-        orderBy: {
-          createdAt: 'desc',
-        },
-      })
+        })
+      ])
+      
 
       return res.send({ 
         attendees: attendees.map(attendee => {
@@ -70,7 +84,8 @@ export async function getEventAttendees(app: FastifyInstance) {
             createAt: attendee.createdAt,
             checkInAt: attendee.checkIn?.createdAt ?? null, 
           }
-        })
+        }),
+        total,
        })
     })
 }
