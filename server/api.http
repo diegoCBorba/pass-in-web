@@ -1,0 +1,24 @@
+POST http://localhost:3333/events
+Content-Type: application/json
+
+{
+  "title": "1",
+  "details": "Massa demais esse evento",
+  "maximumAttendees": 50
+}
+
+###
+POST http://localhost:3333/events/af6c0228-7bdf-4e4d-bee1-b9611446acd7/attendees
+Content-Type: application/json
+
+{
+  "name": "Pedro Barroso",
+  "email": "diegocardosobsantos@gmail.com"
+}
+
+
+###
+GET http://localhost:3333/events/f2470d71-d500-43a8-8129-3627acf55dbd
+
+###
+GET http://localhost:3333/attendees/2/badge
