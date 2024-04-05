@@ -1,6 +1,7 @@
 # pass.in
 
-O pass.in é uma aplicação de **gestão de participantes em eventos presenciais**. Esta é a documentação para o projeto.
+O pass.in é uma aplicação de **gestão de participantes em eventos presenciais**. 
+- OBS: Informações dos requisitos na pasta `server`
 
 ## Configurações
 
