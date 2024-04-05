@@ -2,13 +2,13 @@ POST http://localhost:3333/events
 Content-Type: application/json
 
 {
-  "title": "1",
-  "details": "Massa demais esse evento",
+  "title": 123,
+  "details": null,
   "maximumAttendees": 50
 }
 
 ###
-POST http://localhost:3333/events/af6c0228-7bdf-4e4d-bee1-b9611446acd7/attendees
+POST http://localhost:3333/events/9e9bd979-9d10-4915-b339-3786b1634f33/attendees
 Content-Type: application/json
 
 {
@@ -16,9 +16,14 @@ Content-Type: application/json
   "email": "diegocardosobsantos@gmail.com"
 }
 
+###
+GET http://localhost:3333/events/9e9bd979-9d10-4915-b339-3786b1634f33
 
 ###
-GET http://localhost:3333/events/f2470d71-d500-43a8-8129-3627acf55dbd
+GET http://localhost:3333/attendees/10000/badge
 
 ###
-GET http://localhost:3333/attendees/2/badge
+GET http://localhost:3333/attendees/10000/check-in
+
+###
+GET http://localhost:3333/events/9e9bd979-9d10-4915-b339-3786b1634f33/attendees
