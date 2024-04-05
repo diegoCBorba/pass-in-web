@@ -1,12 +1,20 @@
-# pass.in
+## Scripts Disponíveis
 
-O pass.in é uma aplicação de **gestão de participantes em eventos presenciais**. 
+- `npm start`: Inicia o servidor em produção.
+- `npm run build`: Compila o código TypeScript para JavaScript.
+- `npm run dev`: Inicia o servidor em modo de desenvolvimento.
+- `npm run db:migrate`: Aplica as migrações do banco de dados utilizando o Prisma.
+- `npm run db:studio`: Abre o Prisma Studio para visualização e edição do banco de dados.
 
-A ferramenta permite que o organizador cadastre um evento e abra uma página pública de inscrição.
+## Tecnologias Utilizadas
 
-Os participantes inscritos podem emitir uma credencial para check-in no dia do evento.
-
-O sistema fará um scan da credencial do participante para permitir a entrada no evento.
+- [Fastify](https://www.fastify.io/) - Framework web para Node.js.
+- [Prisma](https://www.prisma.io/) - ORM para bancos de dados SQL.
+- [Zod](https://github.com/colinhacks/zod) - Biblioteca para validação de dados.
+- [fastify-type-provider-zod](https://github.com/turkerdev/fastify-type-provider-zod) - Provedor de tipos para validação de dados com Zod em Fastify.
+- [Day.js](https://day.js.org/) - Manipulação de datas.
+- [Fastify Swagger](https://github.com/fastify/fastify-swagger) - Plugin Fastify para documentação Swagger.
+- [Fastify Swagger UI](https://github.com/fastify/fastify-swagger-ui) - Interface de usuário Swagger para Fastify.
 
 ## Requisitos
 
@@ -29,17 +37,13 @@ O sistema fará um scan da credencial do participante para permitir a entrada no
 
 - [x] O check-in no evento será realizado através de um QRCode;
 
-## Documentação da API (Swagger)
+## Uso do Swagger
 
-Para documentação da API, acesse o link: https://nlw-unite-nodejs.onrender.com/docs
+A documentação da API está disponível através do Swagger UI. Você pode acessá-la através da rota `/docs`.
 
 ## Banco de dados
 
-Nessa aplicação vamos utilizar banco de dados relacional (SQL). Para ambiente de desenvolvimento seguiremos com o SQLite pela facilidade do ambiente.
-
-### Diagrama ERD
-
-<img src=".github/erd.svg" width="600" alt="Diagrama ERD do banco de dados" />
+Nessa aplicação vamos utilizar banco de dados relacional (SQL). Para ambiente de desenvolvimento utilizei o SQLite.
 
 ### Estrutura do banco (SQL)
 
